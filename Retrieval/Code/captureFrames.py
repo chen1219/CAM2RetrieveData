@@ -1,3 +1,4 @@
+"""Take a file that contains sources to capture frames."""
 
 # The program takes a file that contains sources to capture frames.
 
@@ -14,7 +15,22 @@ lock = multiprocessing.Lock()
 # Path to save the frames
 RESULTS_PATH = "/home/sara/CAM2RetrieveData/Retrieval/Code/results"
 
+
+
 def parse_args(args):
+	"""Parses argument. 
+    **Parameters:** 
+    
+    args : TBD
+        TBD
+
+    **Returns:**
+   
+    parser.parse_args(args) : TBD
+        TBD
+        
+	"""
+	
     desc = 'Check sources for MJPEG Stream Parser.'
     prog = 'checkSource.py'
     parser = argparse.ArgumentParser(prog=prog, description=desc)

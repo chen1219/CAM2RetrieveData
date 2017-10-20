@@ -6,8 +6,8 @@ all types of cameras. The module provides different subclasses, each for a
 different type of cameras (e.g. IP cameras, and non-IP cameras). The module
 also provides the StreamFormat Enum for the different camera stream formats.
 
-Examples
---------
+**Examples**
+
 Example 1: To get frames from a non-IP camera image stream:
 1. Initialize a NonIPCamera object using the ID and the URL of the camera
 image stream.
@@ -54,6 +54,8 @@ while time.time() - t < 5:
     cv2.waitKey(30)
 camera.close_stream()
 
+**Classes & Functions** 
+
 """
 import error
 import stream_parser
@@ -62,8 +64,8 @@ import stream_parser
 class StreamFormat(object):
     """Represent an Enum for the different camera stream formats.
 
-    Attributes
-    ----------
+    **Attributes:**
+    
     IMAGE : int
         The constant class variable representing image streams.
     MJPEG : int
@@ -78,20 +80,20 @@ class StreamFormat(object):
 class Camera(object):
     """Represent the base class for all types of cameras.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     id : int
         The unique camera ID.
 
-    Attributes
-    ----------
+    **Attributes:**
+    
     id : int
         The unique camera ID.
     parser : StreamParser
         The parser of the camera stream.
 
-    Notes
-    -----
+    **Notes**
+    
     A camera handles a single stream at a time. Use the open_stream method to
     open the stream of the desired format (e.g. MJPEG). Then, use the method
     get_frame to get frames from the currently open stream. Then, use the
@@ -110,14 +112,14 @@ class Camera(object):
     def open_stream(self, stream_format):
         """Open the camera stream of the given format.
 
-        Parameters
-        ----------
+        **Parameters:**
+       
         stream_format : int
             The stream format of the camera. This can be any of the StreamFormat
             class variables (e.g. StreamFormat.IMAGE or StreamFormat.MJPEG)
 
-        Raises
-        ------
+        **Raises:**
+        
         error.UnreachableCameraError
             If the camera is unreachable.
 
@@ -143,15 +145,15 @@ class Camera(object):
     def get_frame(self):
         """Get the most recent frame from the currently open camera stream.
 
-        Returns
-        -------
+        **Returns:**
+        
         numpy.ndarray
             The downloaded frame.
         int
             The size of the downloaded frame in bytes.
 
-        Raises
-        ------
+        **Raises:**
+        
         error.CorruptedFrameError
             If the frame is corrupted.
         error.UnreachableCameraError
@@ -171,8 +173,8 @@ class IPCamera(Camera):
     This class subclasses the Camera class and inherits its attributes and
     extends its constructor.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     id : int
         The unique camera id.
     ip : str
@@ -184,8 +186,8 @@ class IPCamera(Camera):
     port : int, optional
         The port of the camera.
 
-    Attributes
-    ----------
+    **Attributes:**
+    
     ip : str
         The IP address of the camera.
     image_path : str
@@ -195,8 +197,8 @@ class IPCamera(Camera):
     port : int
         The port of the camera.
 
-    Notes
-    -----
+    **Notes**
+   
     By default, the constructor of this class initializes an ImageStreamParser
     so that frames can be retrieved from the image stream without the need to
     call the open_stream method.
@@ -218,14 +220,14 @@ class IPCamera(Camera):
     def open_stream(self, stream_format):
         """Open the camera stream of the given format.
 
-        Parameters
-        ----------
+        **Parameters:**
+        
         stream_format : int
             The stream format of the camera. This can be any of the StreamFormat
             class variables (e.g. StreamFormat.IMAGE or StreamFormat.MJPEG)
 
-        Raises
-        ------
+        **Raises:**
+        
         ValueError
             If the value of stream_format is invalid.
         error.UnreachableCameraError
@@ -249,8 +251,8 @@ class IPCamera(Camera):
     def close_stream(self):
         """Close the currently open camera stream.
 
-        Notes
-        -----
+        **Notes**
+        
         After closing the currently open camera stream, this method initializes
         an ImageStreamParser so that frames can be retrieved from the image
         stream without the need to call the open_stream method.
@@ -263,19 +265,19 @@ class IPCamera(Camera):
     def get_url(self, stream_format=StreamFormat.IMAGE):
         """Get the URL to the camera stream of the given format.
 
-        Parameters
-        ----------
+        **Parameters:**
+        
         stream_format : int, optional
             The stream format of the camera. This can be any of the StreamFormat
             class variables (e.g. StreamFormat.IMAGE or StreamFormat.MJPEG)
 
-        Returns
-        -------
+        **Returns:**
+        
         url : str
             The URL to the camera stream of the given format.
 
-        Raises
-        ------
+        **Raises:**
+        
         ValueError
             If the value of stream_format is invalid.
 
@@ -318,20 +320,20 @@ class NonIPCamera(Camera):
     recent frame from the camera. This class subclasses the Camera class and
     inherits its attributes and extends its constructor.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     id : int
         The unique camera ID.
     url : str
         The URL that is used to get the most recent frame from the camera.
 
-    Attributes
-    ----------
+    **Attributes:**
+    
     url : str
         The URL that is used to get the most recent frame from the camera.
 
-    Notes
-    -----
+    **Notes**
+    
     By default, the constructor of this class initializes an ImageStreamParser
     so that frames can be retrieved from the image stream without the need to
     call the open_stream method.
@@ -353,15 +355,15 @@ class StreamCamera(Camera):
     recent frame from the camera. The This class subclasses the Camera class and
     inherits its attributes and extends its constructor.
 
-    Parameters
-    ----------
+    **Parameters:**
+   
     id : int
         The unique camera ID.
     url : str
         The URL that is used to get the most recent frame from the camera.
 
-    Attributes
-    ----------
+    **Attributes:**
+   
     url : str
         The URL that is used to get the most recent frame from the camera.
 

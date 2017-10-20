@@ -5,8 +5,8 @@ provides the StreamParser base class which provides a uniform way of parsing
 all camera streams. The module provides different subclasses, each for a
 different type of camera streams (e.g. image streams, and MJPEG streams).
 
-Examples
---------
+**Examples**
+
 Example 1: To parse a camera image stream:
 1. Initialize an object of ImageStreamParser using the URL of the camera
 image stream.
@@ -51,13 +51,13 @@ import error
 class StreamParser(object):
     """Represent the base class for camera stream parsers.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     url : str
         The URL of the stream.
 
-    Attributes
-    ----------
+    **Attributes:**
+    
     url : str
         The URL of the stream.
 
@@ -69,8 +69,8 @@ class StreamParser(object):
     def open_stream(self):
         """Open the stream.
 
-        Raises
-        ------
+        **Raises:**
+        
         error.UnreachableCameraError
             If the camera is unreachable.
 
@@ -99,15 +99,15 @@ class StreamParser(object):
 
         This method is an abstract method that must be overridden by subclasses.
 
-        Returns
-        -------
+        **Returns**
+        
         numpy.ndarray
             The downloaded frame.
         int
             The size of the downloaded frame in bytes.
 
-        Raises
-        ------
+        **Raises:**
+        
         error.CorruptedFrameError
             If the frame is corrupted.
         error.UnreachableCameraError
@@ -127,8 +127,8 @@ class ImageStreamParser(StreamParser):
     This class subclasses the StreamParser class and inherits its attributes
     and constructor.
 
-    Notes
-    -----
+    **Notes**
+    
     A camera that provides an image stream is a camera that provides a URL to
     get the most recent frame (regardless of how recent it is). Hence, Parsing
     an image stream is as simple as downloading the most recent frame from the
@@ -140,15 +140,15 @@ class ImageStreamParser(StreamParser):
     def get_frame(self):
         """Get the most recent frame from the camera image stream.
 
-        Returns
-        -------
+        **Returns:**
+        
         frame : numpy.ndarray
             The downloaded frame.
         frame_size : int
             The size of the downloaded frame in bytes.
 
-        Raises
-        ------
+        **Raises:**
+        
         error.CorruptedFrameError
             If the frame is corrupted.
         error.UnreachableCameraError
@@ -186,13 +186,13 @@ class MJPEGStreamParser(StreamParser):
     This class subclasses the StreamParser class and inherits its attributes
     and extends its constructor.
 
-    Parameters
-    ----------
+    **Parameters:**
+   
     url : str
         The URL of the MJPEG stream.
 
-    Attributes
-    ----------
+    **Attributes:**
+    
     mjpeg_stream : file-like object
         The handle to the camera MJPEG stream.
 
@@ -205,8 +205,8 @@ class MJPEGStreamParser(StreamParser):
     def open_stream(self):
         """Open the MJPEG stream.
 
-        Raises
-        ------
+        **Raises:**
+        
         error.UnreachableCameraError
             If the camera is unreachable.
 
@@ -227,22 +227,22 @@ class MJPEGStreamParser(StreamParser):
     def get_frame(self):
         """Get the most recent frame from the camera MJPEG stream.
 
-        Returns
-        -------
+        **Returns:**
+        
         frame : numpy.ndarray
             The downloaded frame.
         frame_size : int
             The size of the downloaded frame in bytes.
 
-        Raises
-        ------
+        **Raises:**
+        
         error.CorruptedFrameError
             If the frame is corrupted.
         error.ClosedStreamError
             If the MJPEG stream needs to be opened first.
 
-        Notes
-        -----
+        **Notes**
+        
         MJPEG Stream Format:
         --myboundary
         Content-Type: image/jpeg
@@ -319,13 +319,13 @@ class mjpgStreamParser(StreamParser):
     This class subclasses the StreamParser class and inherits its attributes
     and extends its constructor.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     url : str
         The URL of the MJPEG stream.
 
-    Attributes
-    ----------
+    **Attributes:**
+    
     mjpeg_stream : file-like object
         The handle to the camera MJPEG stream.
 
@@ -338,15 +338,15 @@ class mjpgStreamParser(StreamParser):
     def get_frame(self):
         """Get the most recent frame from the camera MJPEG stream.
 
-        Returns
-        -------
+        **Returns:**
+        
         frame : numpy.ndarray
             The downloaded frame.
         frame_size : int
             The size of the downloaded frame in bytes.
 
-        Raises
-        ------
+        **Raises:**
+        
         error.CorruptedFrameError
             If the frame is corrupted.
         error.ClosedStreamError

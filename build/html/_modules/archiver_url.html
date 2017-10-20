@@ -1,0 +1,315 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>archiver_url &#8212; Sphinx_Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for archiver_url</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This program archives images from a set of cameras.</span>
+
+<span class="sd">To use this program:</span>
+<span class="sd">python archiver.py &lt;input_file&gt; &lt;duration&gt; &lt;interval&gt;</span>
+
+<span class="sd">where:</span>
+<span class="sd">&lt;input_file&gt; is the path to the two-column space-separated input file. The</span>
+<span class="sd">first column is the integer camera ID, and the second column is the camera URL.</span>
+<span class="sd">&lt;duration&gt; is the archiving duration in seconds.</span>
+<span class="sd">&lt;interval&gt; is the interval between two frames in seconds (or 0 for the maximum</span>
+<span class="sd">frame rate possible).</span>
+
+<span class="sd">For example, this command downloads a snapshot from every camera every one</span>
+<span class="sd">second for 60 seconds.</span>
+<span class="sd">python archiver.py cams.txt 60 1</span>
+
+<span class="sd">Sample input file:</span>
+<span class="sd">31837 http://207.251.86.238/cctv290.jpg</span>
+<span class="sd">31838 http://207.251.86.238/cctv294.jpg</span>
+<span class="sd">31839 http://207.251.86.238/cctv296.jpg</span>
+<span class="sd">31840 http://207.251.86.238/cctv297.jpg</span>
+<span class="sd">31843 http://207.251.86.238/cctv302.jpg</span>
+<span class="sd">31844 http://207.251.86.238/cctv303.jpg</span>
+<span class="sd">31918 http://207.251.86.238/cctv428.jpg</span>
+<span class="sd">31919 http://207.251.86.238/cctv429.jpg</span>
+<span class="sd">31921 http://207.251.86.238/cctv431.jpg</span>
+<span class="sd">31950 http://207.251.86.238/cctv467.jpg</span>
+<span class="sd">31954 http://207.251.86.238/cctv470.jpg</span>
+<span class="sd">31963 http://207.251.86.238/cctv482.jpg</span>
+
+<span class="sd">**Notes**</span>
+
+<span class="sd">This program has a single third-party dependency: the PIL library. It can be</span>
+<span class="sd">installed using the following command:</span>
+<span class="sd">sudo apt-get install python-imaging</span>
+
+
+<span class="sd">**Classes and Functions**</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">urllib2</span> <span class="k">import</span> <span class="n">urlopen</span>
+<span class="kn">from</span> <span class="nn">StringIO</span> <span class="k">import</span> <span class="n">StringIO</span>
+
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
+
+
+<span class="c1"># The path of the results directory.</span>
+<span class="n">RESULTS_PATH</span> <span class="o">=</span> <span class="s1">&#39;results&#39;</span>
+
+
+<div class="viewcode-block" id="read_file"><a class="viewcode-back" href="../Retrieval.html#archiver_url.read_file">[docs]</a><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read the input two-column file into a dictionary.</span>
+
+<span class="sd">    **Parameters:**</span>
+<span class="sd">    </span>
+<span class="sd">    path : str</span>
+<span class="sd">        The path of the input file.</span>
+
+<span class="sd">    **Returns:**</span>
+<span class="sd">    </span>
+<span class="sd">    cams : dict</span>
+<span class="sd">        The dictionary with camera IDs and URLs as the keys and values.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="n">cams</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">cams</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">cams</span></div>
+
+
+<div class="viewcode-block" id="download_image"><a class="viewcode-back" href="../Retrieval.html#archiver_url.download_image">[docs]</a><span class="k">def</span> <span class="nf">download_image</span><span class="p">(</span><span class="n">image_url</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Download an online image given its URL.</span>
+
+<span class="sd">    **Parameters:**</span>
+<span class="sd">    </span>
+<span class="sd">    image_url : str</span>
+<span class="sd">        The full URL of the image to be downloaded.</span>
+
+<span class="sd">    **Returns:**</span>
+<span class="sd">    </span>
+<span class="sd">    image : PIL.Image.Image</span>
+<span class="sd">        The downloaded image in RGB format.</span>
+
+<span class="sd">    **Raises:**</span>
+<span class="sd">    </span>
+<span class="sd">    Exception</span>
+<span class="sd">        If there is any error downloading the image.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Download the image.</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">urlopen</span><span class="p">(</span><span class="n">image_url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()))</span>
+
+        <span class="c1"># Convert the image format to RGB if it is not.</span>
+        <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">mode</span> <span class="o">!=</span> <span class="s2">&quot;RGB&quot;</span><span class="p">:</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Error downloading the image.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">image</span></div>
+
+
+<div class="viewcode-block" id="CameraHandler"><a class="viewcode-back" href="../Retrieval.html#archiver_url.CameraHandler">[docs]</a><span class="k">class</span> <span class="nc">CameraHandler</span><span class="p">(</span><span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The thread to download snapshots from a single camera.</span>
+
+<span class="sd">    **Parameters:**</span>
+<span class="sd">    </span>
+<span class="sd">    id : int</span>
+<span class="sd">        The ID of the the camera.</span>
+<span class="sd">    url : str</span>
+<span class="sd">        The URL of the camera image stream.</span>
+<span class="sd">    duration : int</span>
+<span class="sd">        The duration of downloading the images in seconds.</span>
+<span class="sd">    interval : int</span>
+<span class="sd">        The interval between each two successive snapshots.</span>
+<span class="sd">    </span>
+<span class="sd">    **Attributes:**</span>
+<span class="sd">    </span>
+<span class="sd">    id : int</span>
+<span class="sd">        The ID of the the camera.</span>
+<span class="sd">    url : str</span>
+<span class="sd">        The URL of the camera image stream.</span>
+<span class="sd">    duration : int</span>
+<span class="sd">        The duration of downloading the images in seconds.</span>
+<span class="sd">    interval : int</span>
+<span class="sd">        The interval between each two successive snapshots.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">=</span> <span class="n">duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">=</span> <span class="n">interval</span>
+
+<div class="viewcode-block" id="CameraHandler.run"><a class="viewcode-back" href="../Retrieval.html#archiver_url.CameraHandler.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Download snapshots from the camera, and save locally.&quot;&quot;&quot;</span>
+
+        <span class="c1"># Create the camera results directory.</span>
+        <span class="n">cam_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">RESULTS_PATH</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">cam_directory</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Set the starting timestamp, and process until the end of the duration.</span>
+        <span class="n">start_timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_timestamp</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
+
+            <span class="c1"># Set the timestamp of the snapshot that will be downloaded.</span>
+            <span class="n">frame_timestamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Download the image.</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">download_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Save the image.</span>
+                <span class="n">file_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">/</span><span class="si">{}</span><span class="s1">_</span><span class="si">{}</span><span class="s1">.png&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">cam_directory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                        <span class="n">frame_timestamp</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">_%H-%M-%S-</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+            <span class="c1"># Sleep until the interval between frames ends.</span>
+            <span class="n">time_to_sleep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interval</span> <span class="o">-</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">frame_timestamp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">time_to_sleep</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">time_to_sleep</span><span class="p">)</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="c1"># Read the input arguments.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="n">input_file_path</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">archiver</span>
+        <span class="nb">print</span> <span class="n">archiver</span><span class="o">.</span><span class="vm">__doc__</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Read the input file.</span>
+    <span class="n">cams</span> <span class="o">=</span> <span class="n">read_file</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">)</span>
+
+    <span class="n">camera_handlers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">cams</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="c1"># Create a new thread to handle the camera.</span>
+        <span class="n">camera_handler</span> <span class="o">=</span> <span class="n">CameraHandler</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
+        <span class="c1"># Run the thread.</span>
+        <span class="n">camera_handler</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="c1"># Add the thread to the array of threads.</span>
+        <span class="n">camera_handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">camera_handler</span><span class="p">)</span>
+
+        <span class="c1"># Sleep to shift the starting time of all the threads.</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">cams</span><span class="p">))</span>
+
+    <span class="c1"># Wait for all the threads to finish execution.</span>
+    <span class="k">for</span> <span class="n">camera_handler</span> <span class="ow">in</span> <span class="n">camera_handlers</span><span class="p">:</span>
+        <span class="n">camera_handler</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Sphinx_Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Retrieval.html">Retrieval Module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Tiffany Chen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

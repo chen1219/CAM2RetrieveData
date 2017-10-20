@@ -1,0 +1,194 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Di Module &#8212; Sphinx_Documentation  documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="di-module">
+<h1>Di Module<a class="headerlink" href="#di-module" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-archiver">
+<span id="archiver"></span><h2>archiver<a class="headerlink" href="#module-archiver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="archiver.CameraHandler">
+<em class="property">class </em><code class="descclassname">archiver.</code><code class="descname">CameraHandler</code><span class="sig-paren">(</span><em>camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/archiver.html#CameraHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#archiver.CameraHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>The thread to download snapshots from a single camera.</p>
+<p><strong>Parameters:</strong></p>
+<dl class="docutils">
+<dt>camera <span class="classifier-delimiter">:</span> <span class="classifier">camera object</span></dt>
+<dd>The camera from which snapshots will be taken.</dd>
+</dl>
+<p><strong>Attributes:</strong></p>
+<dl class="docutils">
+<dt>camera <span class="classifier-delimiter">:</span> <span class="classifier">camera object</span></dt>
+<dd>The camera from which snapshots will be taken.</dd>
+<dt>id <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>The ID of the the camera.</dd>
+<dt>url <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>The URL of the camera image stream.</dd>
+<dt>duration <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>The duration of downloading the images in seconds.</dd>
+<dt>interval <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>The interval between each two successive snapshots.</dd>
+</dl>
+<dl class="method">
+<dt id="archiver.CameraHandler.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/archiver.html#CameraHandler.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#archiver.CameraHandler.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download snapshots from the camera, and save locally.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="archiver.archiver">
+<code class="descclassname">archiver.</code><code class="descname">archiver</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/archiver.html#archiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#archiver.archiver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates and adjusts to a new thread to handle the parsed camera.</p>
+<p><strong>Parameters:</strong></p>
+<dl class="docutils">
+<dt>args <span class="classifier-delimiter">:</span> <span class="classifier">TBD</span></dt>
+<dd>TBD</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="archiver.get_camera_db">
+<code class="descclassname">archiver.</code><code class="descname">get_camera_db</code><span class="sig-paren">(</span><em>camera_id</em>, <em>duration</em>, <em>interval</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/archiver.html#get_camera_db"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#archiver.get_camera_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a camera from the database.</p>
+<p><strong>Parameters:</strong></p>
+<dl class="docutils">
+<dt>camera_id <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>The camera from the database’s ID.</dd>
+<dt>duration <span class="classifier-delimiter">:</span> <span class="classifier">int </span></dt>
+<dd>The duration of downloading the integer in seconds.</dd>
+<dt>interval <span class="classifier-delimiter">:</span> <span class="classifier">int </span></dt>
+<dd>The interval between two successive snapshots.</dd>
+</dl>
+<p><strong>Returns:</strong></p>
+<dl class="docutils">
+<dt>camera <span class="classifier-delimiter">:</span> <span class="classifier">camera object</span></dt>
+<dd>The camera from which snapshots will be taken.</dd>
+</dl>
+<p><strong>Raises:</strong></p>
+<dl class="docutils">
+<dt>Exceptions <span class="classifier-delimiter">:</span> <span class="classifier"></span></dt>
+<dd>If there is an error downloading MYSQLdb.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="archiver.parse_input">
+<code class="descclassname">archiver.</code><code class="descname">parse_input</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/archiver.html#parse_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#archiver.parse_input" title="Permalink to this definition">¶</a></dt>
+<dd><p>Archives camera objects, then parses the file.</p>
+<p><strong>Parameters:</strong></p>
+<dl class="docutils">
+<dt>args <span class="classifier-delimiter">:</span> <span class="classifier">TBD</span></dt>
+<dd>TBD</dd>
+</dl>
+<p><strong>Returns:</strong></p>
+<dl class="docutils">
+<dt>cams <span class="classifier-delimiter">:</span> <span class="classifier">dict</span></dt>
+<dd>The dictionary with camera IDs and URLS as the keys and values.</dd>
+</dl>
+<p><strong>Raises:</strong></p>
+<dl class="docutils">
+<dt>Exception <span class="classifier-delimiter">:</span> <span class="classifier"></span></dt>
+<dd>If no camera_id exists in line of input file.</dd>
+<dt>Exception <span class="classifier-delimiter">:</span> <span class="classifier"></span></dt>
+<dd>If no duration or interval exists in line of input file.</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Sphinx_Documentation</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Retrieval.html">Retrieval Module</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Tiffany Chen.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/Discovery.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

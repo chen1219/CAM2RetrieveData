@@ -17,7 +17,32 @@ RESULTS_PATH = 'results'
 
 
 def get_camera_db(camera_id, duration, interval):
-    """ Get a camera from the database. """
+    """ Get a camera from the database. 
+    
+    **Parameters:** 
+    
+    camera_id : str
+    	The camera from the database's ID. 
+    	
+    duration : int 
+    	The duration of downloading the integer in seconds.  
+    	
+    interval : int 
+    	The interval between two successive snapshots. 
+       
+        
+    **Returns:** 
+    
+    camera : camera object
+    	The camera from which snapshots will be taken. 
+    
+    
+    **Raises:** 
+    
+    Exceptions : 
+    	If there is an error downloading MYSQLdb. 
+     
+    """
     try:
         import MySQLdb
     except Exception as e:
@@ -83,14 +108,14 @@ def get_camera_db(camera_id, duration, interval):
 
 class CameraHandler(threading.Thread):
     """The thread to download snapshots from a single camera.
+	
+    **Parameters:**
 
-    Parameters
-    ----------
     camera : camera object
         The camera from which snapshots will be taken.
 
-    Attributes
-    ----------
+    **Attributes:**
+
     camera : camera object
         The camera from which snapshots will be taken.
     id : int
@@ -149,6 +174,30 @@ class CameraHandler(threading.Thread):
 
 
 def parse_input(args):
+    """Archives camera objects, then parses the file.
+    
+    **Parameters:** 
+    
+    args : TBD
+    	TBD
+    	
+        
+    **Returns:** 
+    
+    cams : dict
+    	The dictionary with camera IDs and URLS as the keys and values.
+    
+    
+    **Raises:** 
+    
+    Exception : 
+    	If no camera_id exists in line of input file. 
+    	
+    Exception : 
+    	If no duration or interval exists in line of input file. 
+     
+    """    
+    
     # List of camera objects to archive
     cams = []
     # Read the input arguments.
@@ -210,6 +259,14 @@ def parse_input(args):
 
 
 def archiver(args):
+    """Creates and adjusts to a new thread to handle the parsed camera.
+    
+    **Parameters:** 
+    
+    args : TBD
+    	TBD
+    	
+    """   
     cams = parse_input(args)
 
     camera_handlers = []

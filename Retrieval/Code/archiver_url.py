@@ -28,11 +28,14 @@ Sample input file:
 31954 http://207.251.86.238/cctv470.jpg
 31963 http://207.251.86.238/cctv482.jpg
 
-Notes
------
+**Notes**
+
 This program has a single third-party dependency: the PIL library. It can be
 installed using the following command:
 sudo apt-get install python-imaging
+
+
+**Classes and Functions**
 
 """
 
@@ -54,15 +57,15 @@ RESULTS_PATH = 'results'
 def read_file(path):
     """Read the input two-column file into a dictionary.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     path : str
         The path of the input file.
 
-    Returns
-    -------
+    **Returns:**
+    
     cams : dict
-        The dictionary withe camera IDs and URLs as the keys and values.
+        The dictionary with camera IDs and URLs as the keys and values.
 
     """
     with open(path) as f:
@@ -79,18 +82,18 @@ def read_file(path):
 def download_image(image_url):
     """Download an online image given its URL.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     image_url : str
         The full URL of the image to be downloaded.
 
-    Returns
-    -------
+    **Returns:**
+    
     image : PIL.Image.Image
         The downloaded image in RGB format.
 
-    Raises
-    ------
+    **Raises:**
+    
     Exception
         If there is any error downloading the image.
 
@@ -111,8 +114,8 @@ def download_image(image_url):
 class CameraHandler(threading.Thread):
     """The thread to download snapshots from a single camera.
 
-    Parameters
-    ----------
+    **Parameters:**
+    
     id : int
         The ID of the the camera.
     url : str
@@ -121,9 +124,9 @@ class CameraHandler(threading.Thread):
         The duration of downloading the images in seconds.
     interval : int
         The interval between each two successive snapshots.
-
-    Attributes
-    ----------
+    
+    **Attributes:**
+    
     id : int
         The ID of the the camera.
     url : str
